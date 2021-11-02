@@ -7,6 +7,14 @@
 #### - 게시물 조회수 구현
 
 ---
+## 팀원
+
+| Name | Git | Blog | 
+|:------:|-------------|-----|
+|김정수 |https://github.com/hollibleling|https://velog.io/@hollibleling|
+|윤현묵 |https://github.com/fall031-muk|https://velog.io/@fall031|
+|최현수 |https://github.com/filola|https://velog.io/@chs_0303|
+---
 
 ## 구현한 방법과 이유에 대한 간략한 내용
 
