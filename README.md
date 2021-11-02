@@ -35,6 +35,7 @@
 |POST|/user/signup||name, nickname, email, password|회원가입|
 |POST|/user/login||email, password|로그인|
 |POST|/post/list|Authorization|title, body, category|게시물 작성|
+|POST|/post/search||search_word|게시글 검색|
 |GET|/post/detail/<int:post_id>|Authorization, cookie||게시물 조회|
 |DELETE|/post/detail/<int:post_id>|Authorization||게시물 삭제|
 |PUT|/post/detail/<int:post_id>|Authorization|title, body, category|게시물 수정|
@@ -251,4 +252,24 @@ GET "http://127.0.0.1:8000/posts/list?category=자유게시판 HTTP/1.1"
             "hit": 0
         }
    ]
+}
+
+### 9. 게시물 검색
+- Method : POST
+- EndpointURL : /posts/search
+- Remark : 게시글 내용 or 제목 검색 기능
+- Request
+```
+POST "http://127.0.0.1:8000/posts/search"
+```
+- Response
+```
+{
+    "Result": [
+        {
+            "title": "안녕하세요",
+            "user": "김정수",
+            "body": "처음 뵙겠습니다. 김정수 입니다~!"
+        }
+    ]
 }
