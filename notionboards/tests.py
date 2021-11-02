@@ -2,11 +2,11 @@ import json, jwt
 
 from django.test import TestCase, Client, client
 
-from .models import Notion
+from .models import Category, Post
 from users.models import User
 from my_settings import ALGORITHM, SECRET_KEY
 
-class NotionListTest(TestCase):
+class PostListTest(TestCase):
     def setUp(self):
         User.objects.create(
             id = 1,
@@ -24,43 +24,52 @@ class NotionListTest(TestCase):
             email = "sm@naver.com",
             nickname = "sm"
         )
-        Notion.objects.create(
+        Category.objects.create(
+            id=1,
+            name="자유게시판"
+        )
+
+        Post.objects.create(
             id=1,
             title = "first",
             body = "wanted",
             user = User.objects.get(id=1),
+            category_id = Category.objects.get(id=1).id
         )
 
-        Notion.objects.create(
+        Post.objects.create(
             id=2,
             title = "second",
             body = "wecode",
             user = User.objects.get(id=1),
+            category_id = Category.objects.get(id=1).id
         )
 
-        Notion.objects.create(
+        Post.objects.create(
             id=3,
             title = "third",
             body = "love it",
             user = User.objects.get(id=1),
+            category_id = Category.objects.get(id=1).id
         ),
-        Notion.objects.create(
+        Post.objects.create(
             id=5,
             title = "fivth",
             body = "love",
             user = User.objects.get(id=2),
+            category_id = Category.objects.get(id=1).id
         )
         
         
-        
     def tearDown(self):
-        Notion.objects.all().delete()
+        Post.objects.all().delete()
         User.objects.all().delete()
-    
-    def test_get_notion_list_success(self):
+        Category.objects.all().delete()
+
+    def test_get_post_list_success(self):
         client = Client()
 
-        response = client.get('/notion/list')
+        response = client.get('/post/list')
 
         self.assertEqual(response.json(),{
             "Result" : [
@@ -91,34 +100,47 @@ class NotionListTest(TestCase):
                 "hit": 0,
                 "body": "wanted",
                 "nickname": "hs"
-            }],
-            "page" : 1
+            }]
         })
         self.assertEqual(response.status_code, 200)
     
-    def test_get_notion_list_page_not_found(self):
+    def test_get_post_list_page_not_found(self):
         client = Client()
 
-        response = client.get('/notion/list?page=10')
+        response = client.get('/post/list?page=10')
         
         self.assertEqual(response.json(),{
             "message" : "PAGE_NOT_FOUND"
         })
         self.assertEqual(response.status_code, 404)
+    
+    def test_get_post_list_category_not_found(self):
+        client = Client()
 
-    def test_get_notion_success(self):
+        response = client.get('/post/list?category=대한민국')
+        
+        self.assertEqual(response.json(),{
+            "message" : "CATEGORY_NOT_FOUND"
+        })
+        self.assertEqual(response.status_code, 404)
+
+    def test_get_post_success(self):
         client = Client()
         
-        created_at = Notion.objects.get(id=3).created_at
-        updated_at = Notion.objects.get(id=3).updated_at
+        header       = {"HTTP_Authorization" : self.token}
+        token        = header['HTTP_Authorization']
+        
+        created_at = Post.objects.get(id=3).created_at
+        updated_at = Post.objects.get(id=3).updated_at
 
-        response = client.get('/notion/detail?id=3')
+        response = client.get('/post/detail/3', **header, content_type='application/json')
 
         self.assertEqual(response.json(),{
             "Result" : {
                 "body": "love it",
                 "create_at" : created_at.strftime('%Y-%m-%d %H:%M:%S'),
                 "hit": 1,
+                "category": "자유게시판",
                 "nickname": "hs",
                 "title": "third",
                 "update_at" : updated_at.strftime('%Y-%m-%d %H:%M:%S')
@@ -126,17 +148,20 @@ class NotionListTest(TestCase):
             })
         self.assertEqual(response.status_code, 200)
 
-    def test_get_notion_notions_not_found(self):
+    def test_get_post_posts_not_found(self):
         client = Client()
-    
-        response = client.get('/notion/detail?id=50')
+        
+        header       = {"HTTP_Authorization" : self.token}
+        token        = header['HTTP_Authorization']
+        
+        response = client.get('/post/detail/50', **header, content_type='application/json')
 
         self.assertEqual(response.json(),{
-            "message" : "NOTIONS_NOT_FOUND"
+            "message" : "POSTS_NOT_FOUND"
             })
         self.assertEqual(response.status_code, 404)
 
-    def test_post_notion_success(self):
+    def test_post_post_success(self):
         client = Client()
         
         header       = {"HTTP_Authorization" : self.token}
@@ -145,21 +170,22 @@ class NotionListTest(TestCase):
         payload      = jwt.decode(token, SECRET_KEY, algorithms = ALGORITHM)
         user         = User.objects.get(id = payload['id'])
         
-        notion = {
+        post = {
             "id" : 4,
             'user' : user.id,
+            'category' : '자유게시판',
             'title' : 'fourth',
             'body' : 'love too'
         }
     
-        response = client.post("/notion/list", json.dumps(notion), **header, content_type='application/json')
+        response = client.post("/post/list", json.dumps(post), **header, content_type='application/json')
        
         self.assertEqual(response.json(),{
             "message" : "SUCCESS"
         })
         self.assertEqual(response.status_code, 201)
 
-    def test_post_notion_key_error(self):
+    def test_post_post_key_error(self):
         client = Client()
         
         header       = {"HTTP_Authorization" : self.token}
@@ -168,20 +194,20 @@ class NotionListTest(TestCase):
         payload      = jwt.decode(token, SECRET_KEY, algorithms = ALGORITHM)
         user         = User.objects.get(id = payload['id'])
         
-        notion = {
+        post = {
             "id" : 4,
             'user' : user.id,
             'title' : 'fourth',
         }
     
-        response = client.post("/notion/list", json.dumps(notion), **header, content_type='application/json')
+        response = client.post("/post/list", json.dumps(post), **header, content_type='application/json')
        
         self.assertEqual(response.json(),{
             "message" : "KEY_ERROR"
         })
         self.assertEqual(response.status_code, 400)
 
-    def test_put_notion_update_success(self):
+    def test_post_post_category_not_found(self):
         client = Client()
         
         header       = {"HTTP_Authorization" : self.token}
@@ -190,65 +216,21 @@ class NotionListTest(TestCase):
         payload      = jwt.decode(token, SECRET_KEY, algorithms = ALGORITHM)
         user         = User.objects.get(id = payload['id'])
         
-        notion = {
+        post = {
             "id" : 4,
             'user' : user.id,
+            'category' : 1,
             'title' : 'fourth',
-            'body' : 'love too'
         }
     
-        response = client.put("/notion/detail?id=1", json.dumps(notion), **header, content_type='application/json')
+        response = client.post("/post/list", json.dumps(post), **header, content_type='application/json')
        
         self.assertEqual(response.json(),{
-            "message" : "SUCCESS"
-        })
-        self.assertEqual(response.status_code, 201)
-    
-    def test_put_notion_key_error(self):
-        client = Client()
-        
-        header       = {"HTTP_Authorization" : self.token}
-        token        = header['HTTP_Authorization']
-        
-        payload      = jwt.decode(token, SECRET_KEY, algorithms = ALGORITHM)
-        user         = User.objects.get(id = payload['id'])
-        
-        notion = {
-            "id" : 4,
-            'user' : user.id,
-            'body' : 'love too'
-        }
-    
-        response = client.put("/notion/detail?id=1", json.dumps(notion), **header, content_type='application/json')
-       
-        self.assertEqual(response.json(),{
-            "message" : "KEY_ERROR"
-        })
-        self.assertEqual(response.status_code, 400)
-
-    def test_put_notion_not_exists(self):
-        client = Client()
-        
-        header       = {"HTTP_Authorization" : self.token}
-        token        = header['HTTP_Authorization']
-        
-        payload      = jwt.decode(token, SECRET_KEY, algorithms = ALGORITHM)
-        user         = User.objects.get(id = payload['id'])
-        
-        notion = {
-            "id" : 4,
-            'user' : user.id,
-            'body' : 'love too'
-        }
-    
-        response = client.put("/notion/detail?id=100", json.dumps(notion), **header, content_type='application/json')
-       
-        self.assertEqual(response.json(),{
-            "message" : "NOTION_NOT_FOUND"
+            "message" : "CATEGORY_NOT_FOUND"
         })
         self.assertEqual(response.status_code, 404)
 
-    def test_put_notion_permission_deny(self):
+    def test_put_post_update_success(self):
         client = Client()
         
         header       = {"HTTP_Authorization" : self.token}
@@ -257,51 +239,142 @@ class NotionListTest(TestCase):
         payload      = jwt.decode(token, SECRET_KEY, algorithms = ALGORITHM)
         user         = User.objects.get(id = payload['id'])
         
-        notion = {
+        post = {
+            "id" : 4,
+            'user' : user.id,
+            'category' : "자유게시판",
+            'title' : 'fourth',
+            'body' : 'love too'
+        }
+    
+        response = client.put("/post/detail/1", json.dumps(post), **header, content_type='application/json')
+       
+        self.assertEqual(response.json(),{
+            "message" : "SUCCESS"
+        })
+        self.assertEqual(response.status_code, 201)
+    
+    def test_put_post_key_error(self):
+        client = Client()
+        
+        header       = {"HTTP_Authorization" : self.token}
+        token        = header['HTTP_Authorization']
+        
+        payload      = jwt.decode(token, SECRET_KEY, algorithms = ALGORITHM)
+        user         = User.objects.get(id = payload['id'])
+        
+        post = {
+            "id" : 4,
+            'user' : user.id,
+            'body' : 'love too'
+        }
+    
+        response = client.put("/post/detail/1", json.dumps(post), **header, content_type='application/json')
+       
+        self.assertEqual(response.json(),{
+            "message" : "KEY_ERROR"
+        })
+        self.assertEqual(response.status_code, 400)
+
+    def test_put_post_not_exists(self):
+        client = Client()
+        
+        header       = {"HTTP_Authorization" : self.token}
+        token        = header['HTTP_Authorization']
+        
+        payload      = jwt.decode(token, SECRET_KEY, algorithms = ALGORITHM)
+        user         = User.objects.get(id = payload['id'])
+        
+        post = {
+            "id" : 4,
+            'user' : user.id,
+            'body' : 'love too'
+        }
+    
+        response = client.put("/post/detail/100", json.dumps(post), **header, content_type='application/json')
+       
+        self.assertEqual(response.json(),{
+            "message" : "POST_NOT_FOUND"
+        })
+        self.assertEqual(response.status_code, 404)
+    
+    def test_put_category_not_exists(self):
+        client = Client()
+        
+        header       = {"HTTP_Authorization" : self.token}
+        token        = header['HTTP_Authorization']
+        
+        payload      = jwt.decode(token, SECRET_KEY, algorithms = ALGORITHM)
+        user         = User.objects.get(id = payload['id'])
+        
+        post = {
+            "id" : 4,
+            'category' : "대한민국",
+            'user' : user.id,
+            'body' : 'love too'
+        }
+    
+        response = client.put("/post/detail/1", json.dumps(post), **header, content_type='application/json')
+       
+        self.assertEqual(response.json(),{
+            "message" : "CATEGORY_NOT_FOUND"
+        })
+        self.assertEqual(response.status_code, 404)
+
+    def test_put_post_permission_deny(self):
+        client = Client()
+        
+        header       = {"HTTP_Authorization" : self.token}
+        token        = header['HTTP_Authorization']
+        
+        payload      = jwt.decode(token, SECRET_KEY, algorithms = ALGORITHM)
+        user         = User.objects.get(id = payload['id'])
+        
+        post = {
             "id" : 5,
             'user' : user.id,
             'title' : 'hello',
             'body' : 'love too'
         }
     
-        response = client.put("/notion/detail?id=5", json.dumps(notion), **header, content_type='application/json')
+        response = client.put("/post/detail/5", json.dumps(post), **header, content_type='application/json')
        
         self.assertEqual(response.json(),{
             "message" : "NO_PERMISSION"
         })
         self.assertEqual(response.status_code, 401)
 
-    def test_delete_notion_success(self):
+    def test_delete_post_success(self):
         client = Client()
 
         header       = {"HTTP_Authorization" : self.token}
 
-        response = client.delete("/notion/detail?id=1", **header)
+        response = client.delete("/post/detail/1", **header)
         
         self.assertEqual(response.json(),{
-            "message" : "NOTION_DELETED"
+            "message" : "POST_DELETED"
         })
         self.assertEqual(response.status_code, 200)
 
-    def test_delete_notion_not_exists(self):
+    def test_delete_post_not_exists(self):
         client = Client()
 
         header       = {"HTTP_Authorization" : self.token}
 
-        response = client.delete("/notion/detail?id=100", **header)
+        response = client.delete("/post/detail/100", **header)
         
         self.assertEqual(response.json(),{
-            "message" : 'NOTION_DOES_NOT_EXIST'
+            "message" : 'POST_DOES_NOT_EXIST'
         })
         self.assertEqual(response.status_code, 404)
     
-    def test_delete_notion_permission_deny(self):
+    def test_delete_post_permission_deny(self):
         client = Client()
 
         header       = {"HTTP_Authorization" : self.token}
         token        = header['HTTP_Authorization']
 
-        response = client.delete("/notion/detail?id=5", **header)
+        response = client.delete("/post/detail/5", **header)
         
         self.assertEqual(response.json(),{
             "message" : "NO_PERMISSION"

@@ -89,7 +89,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'djongo',
         'NAME': 'aimmo',
-    }
+        'host': '127.0.0.1',
+        'port': 27017,}
 }
 
 # Password validation
