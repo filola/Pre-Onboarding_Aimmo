@@ -39,6 +39,8 @@
 |DELETE|/post/detail/<int:post_id>|Authorization||게시물 삭제|
 |PUT|/post/detail/<int:post_id>|Authorization|title, body, category|게시물 수정|
 |GET|/post/list?page=|||게시물 목록 조회|
+|GET|/post/list?category=|||게시물 카테고리 필터|
+
 
 ---
 
@@ -215,3 +217,38 @@ GET "http://127.0.0.1:8000/posts/list?page=1 HTTP/1.1"
     ]
 }
 ```
+### 8. 게시물 카테고리 필터 조회
+- Method : GET
+- EndpointURL : /posts/list?category=
+- Remark : 게시글 카테고리 필터 기능, QueryParams(limit/offset)로 페이지네이션 가능
+- Request
+```
+GET "http://127.0.0.1:8000/posts/list?category=자유게시판 HTTP/1.1"
+```
+- Response
+```
+{
+    "Result": [
+        {
+            "count" : 1,
+            "nickname": "muk1",
+            "title": "1번 게시글",
+            "body": "1번 게시글 내용입니다",
+            "hit": 0
+        },
+        {
+            "count" : 2,
+            "nickname": "muk1",
+            "title": "2번 게시글",
+            "body": "2번 게시글 수정 내용입니다",
+            "hit": 0
+        },
+         {
+            "count" : 3,
+            "nickname": "muk1",
+            "title": "5번 게시글",
+            "body": "5번 게시글 내용입니다",
+            "hit": 0
+        }
+   ]
+}
