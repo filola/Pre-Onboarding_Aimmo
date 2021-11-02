@@ -46,7 +46,7 @@ class SignUpTest(TestCase):
             }
         
         response = client.post('/user/signup', json.dumps(user), content_type='application/json')
-        print(response)
+        
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(),
                         {
@@ -128,9 +128,6 @@ class SignUpTest(TestCase):
                     )
 
 class LoginTest(TestCase):
-    # hashed_password     = bcrypt.hashpw("q1w2e3r!".encode('utf-8'), bcrypt.gensalt())
-    # db_password         = hashed_password.decode('utf-8')
-
     def setUp(self):
         User.objects.create(
             name = "최현수",

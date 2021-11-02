@@ -5,7 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse
 
 from users.decorator import login_decorator
-from .models import Notion
+from .models import Post
 from django.views import View
 
 class ListView(View):
@@ -16,18 +16,18 @@ class ListView(View):
         limit      = page_size * page 
         offset     = limit - page_size
         
-        notions = Notion.objects.all().order_by('-id')
+        posts = Post.objects.all().order_by('-id')
         
-        if not notions [offset:limit]:
+        if not posts [offset:limit]:
             return JsonResponse({"message" : "PAGE_NOT_FOUND"}, status=404)
         
         result = [{
-            "count" : len(notions)-(offset+i),
-            "title" : notion.title,
-            "hit" : notion.hit,
-            "body" : notion.body,
-            "nickname" : notion.user.nickname
-        } for i,notion in enumerate(notions [offset:limit])]
+            "count" : len(posts)-(offset+i),
+            "title" : post.title,
+            "hit" : post.hit,
+            "body" : post.body,
+            "nickname" : post.user.nickname
+        } for i,post in enumerate(posts [offset:limit])]
         
         return JsonResponse({"Result" : result, "page" : page}, status=200)
 
@@ -37,7 +37,7 @@ class ListView(View):
         user = request.user
 
         try:
-            result=Notion.objects.create(
+            result=Post.objects.create(
                 title = data['title'],
                 body = data['body'],
                 user_id = user.id
@@ -46,63 +46,64 @@ class ListView(View):
         except KeyError:
             return JsonResponse({"message" : "KEY_ERROR"}, status=400)
 
-class NotionView(View):
+@login_decorator
+class PostView(View):
     def get(self, request):
-        notion_id = request.GET.get("id")
+        post_id = request.GET.get("id")
 
         try:
-            notion = Notion.objects.get(id=notion_id)
+            post = Post.objects.get(id=post_id)
             
-            notion.hit += 1
-            notion.save()
+            post.hit += 1
+            post.save()
             
             result = {
-                "title" : notion.title,
-                "body" : notion.body,
-                "hit" : notion.hit,
-                "create_at" : notion.created_at.strftime('%Y-%m-%d %H:%M:%S'),
-                "update_at" : notion.updated_at.strftime('%Y-%m-%d %H:%M:%S'),
-                "nickname" : notion.user.nickname
+                "title" : post.title,
+                "body" : post.body,
+                "hit" : post.hit,
+                "create_at" : post.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+                "update_at" : post.updated_at.strftime('%Y-%m-%d %H:%M:%S'),
+                "nickname" : post.user.nickname
             }
             return JsonResponse({"Result" : result}, status=200)
-        except Notion.DoesNotExist:
-            return JsonResponse({"message" : "NOTIONS_NOT_FOUND"}, status=404)
+        except Post.DoesNotExist:
+            return JsonResponse({"message" : "POSTS_NOT_FOUND"}, status=404)
 
     @login_decorator
     def put(self, request):
         data = json.loads(request.body)
-        notion_id = request.GET.get("id")
+        post_id = request.GET.get("id")
         user = request.user
         try:
-            notion = Notion.objects.get(id=notion_id)
+            post = Post.objects.get(id=post_id)
             
-            if not (notion.user_id == user.id):
+            if not (post.user_id == user.id):
                 return JsonResponse({"message" : "NO_PERMISSION"}, status=401)
             
-            notion.title = data["title"]
-            notion.body = data["body"]
-            notion.save()
+            post.title = data["title"]
+            post.body = data["body"]
+            post.save()
 
             return JsonResponse({"message" : "SUCCESS"}, status=201)
         except KeyError:
             return JsonResponse({"message" : "KEY_ERROR"}, status=400)
-        except Notion.DoesNotExist:
-            return JsonResponse({"message" : "NOTION_NOT_FOUND"}, status=404)
+        except Post.DoesNotExist:
+            return JsonResponse({"message" : "POST_NOT_FOUND"}, status=404)
     
     @login_decorator
     def delete(self, request):
-        notion_id = request.GET.get('id')
+        post_id = request.GET.get('id')
         user = request.user
 
         try:
-            notion = Notion.objects.get(id=notion_id)
+            post = Post.objects.get(id=post_id)
             
-            if notion.user_id != user.id:
+            if post.user_id != user.id:
                 return JsonResponse({"message" : "NO_PERMISSION"}, status=401)
             
-            notion.delete()
+            post.delete()
             
-            return JsonResponse({'message': 'NOTION_DELETED'}, status=200)
+            return JsonResponse({'message': 'POST_DELETED'}, status=200)
         
         except ObjectDoesNotExist:
-            return JsonResponse({'message': 'NOTION_DOES_NOT_EXIST'}, status=404)
+            return JsonResponse({'message': 'POST_DOES_NOT_EXIST'}, status=404)
