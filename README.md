@@ -253,7 +253,7 @@ GET "http://127.0.0.1:8000/posts/list?category=자유게시판 HTTP/1.1"
         }
    ]
 }
-
+```
 ### 9. 게시물 검색
 - Method : POST
 - EndpointURL : /posts/search
@@ -273,3 +273,4 @@ POST "http://127.0.0.1:8000/posts/search"
         }
     ]
 }
+```
