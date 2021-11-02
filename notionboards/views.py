@@ -46,8 +46,8 @@ class ListView(View):
         except KeyError:
             return JsonResponse({"message" : "KEY_ERROR"}, status=400)
 
-@login_decorator
 class PostView(View):
+    @login_decorator
     def get(self, request):
         post_id = request.GET.get("id")
 
