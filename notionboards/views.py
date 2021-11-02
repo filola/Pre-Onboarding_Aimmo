@@ -1,6 +1,7 @@
 import json
 from unittest import result
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
 
 from django.http import JsonResponse
 from django.db import transaction
@@ -254,3 +255,28 @@ class CommentView(View):
         comment.delete()
         
         return JsonResponse({"MESSAGE":"DELETE"}, status=204)
+
+
+class SearchView(View):
+    def post(self, request):
+        data = json.loads(request.body)
+
+        try:
+            search_word = data['search_word']
+            all_posts = Post.objects.all()
+            search_posts = all_posts.filter(Q(title__icontains = search_word)|Q(body__icontains = search_word))
+
+            if search_word == "" or search_word == " " or len(search_word) >= 30:
+                return JsonResponse({"message" : "WRONG_REQUEST"}, status=401)
+            
+            results = [
+            {
+                'title' : search_post.title, 
+                'user'  : search_post.user.name,
+                'body'  : search_post.body
+            } for search_post in search_posts]
+
+            return JsonResponse({"Result" : results}, status=200)
+        except KeyError:
+            return JsonResponse({"message" : "KEY_ERROR"}, status=400)
+            

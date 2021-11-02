@@ -126,6 +126,8 @@ class PostListTest(TestCase):
 
     def test_get_post_success(self):
         client = Client()
+        header  = {"HTTP_Authorization" : self.token}
+        token   = header["HTTP_Authorization"]
         
         header       = {"HTTP_Authorization" : self.token}
         token        = header['HTTP_Authorization']
@@ -163,7 +165,6 @@ class PostListTest(TestCase):
 
     def test_post_post_success(self):
         client = Client()
-        
         header       = {"HTTP_Authorization" : self.token}
         token        = header['HTTP_Authorization']
         
@@ -381,3 +382,98 @@ class PostListTest(TestCase):
         })
         self.assertEqual(response.status_code, 401)
         
+class ListSearchTest(TestCase):
+    def setUp(self):
+        User.objects.create(
+            id = 1,
+            name = "최현수",
+            password = "q1w2e3r!",
+            email = "chs@naver.com",
+            nickname = "hs"
+        )
+        self.token = jwt.encode({'id' :User.objects.get(id=1).id}, SECRET_KEY, algorithm = ALGORITHM)
+
+        Post.objects.create(
+            id=1,
+            title = "first",
+            body = "wanted",
+            user = User.objects.get(id=1),
+        )
+
+        Post.objects.create(
+            id=2,
+            title = "second",
+            body = "wecode",
+            user = User.objects.get(id=1),
+        )
+    
+    def tearDwon(self):
+        Post.objects.all().delete()
+
+    def test_search_post_success(self):
+        client = Client()
+
+        search_word = {
+            "search_word" : "wecode"
+        }
+
+        response = client.post("/post/search", json.dumps(search_word), content_type="apllication/json")
+
+        self.assertEqual(response.json(), {
+            "Result": [
+                {
+                    "title": "second",
+                    "user": "최현수",
+                    "body": "wecode"
+                    }]
+                }
+            )
+        self.assertEqual(response.status_code, 200)
+
+    def test_search_post_wrong_request_empty(self):
+        client = Client()
+
+        search_word = {
+            "search_word" : ""
+        }
+
+        response = client.post("/post/search", json.dumps(search_word), content_type="apllication/json")
+
+        self.assertEqual(response.json(), {"message" : "WRONG_REQUEST"})
+        self.assertEqual(response.status_code, 401)
+
+    def test_search_post_wrong_request_space(self):
+        client = Client()
+
+        search_word = {
+            "search_word" : " "
+        }
+
+        response = client.post("/post/search", json.dumps(search_word), content_type="apllication/json")
+
+        self.assertEqual(response.json(), {"message" : "WRONG_REQUEST"})
+        self.assertEqual(response.status_code, 401)
+
+    def test_search_post_wrong_request_too_long(self):
+        client = Client()
+
+        search_word = {
+            "search_word" : "abcdefghijklmnopqrstuvwxyzabcdefg"
+        }
+
+        response = client.post("/post/search", json.dumps(search_word), content_type="apllication/json")
+
+        self.assertEqual(response.json(), {"message" : "WRONG_REQUEST"})
+        self.assertEqual(response.status_code, 401)
+        
+    def test_search_post_key_error(self):
+        client = Client()
+
+        search_word = {
+            "search_words" : "wecode"
+        }
+
+        response = client.post("/post/search", json.dumps(search_word), content_type="apllication/json")
+
+        self.assertEqual(response.json(), {"message" : "KEY_ERROR"})
+        self.assertEqual(response.status_code, 400)
