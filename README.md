@@ -35,12 +35,15 @@
 |POST|/user/signup||name, nickname, email, password|회원가입|
 |POST|/user/login||email, password|로그인|
 |POST|/post/list|Authorization|title, body, category|게시물 작성|
-|POST|/post/search||search_word|게시글 검색|
-|GET|/post/detail/<int:post_id>|Authorization, cookie||게시물 조회|
+|GET|/post/detail/<int:post_id>|Authorization, cookie||게시물 조회 및 댓글 조회 |
 |DELETE|/post/detail/<int:post_id>|Authorization||게시물 삭제|
 |PUT|/post/detail/<int:post_id>|Authorization|title, body, category|게시물 수정|
 |GET|/post/list?page=|||게시물 목록 조회|
 |GET|/post/list?category=|||게시물 카테고리 필터|
+|POST|/post/<int:post_id>/comments||content, parent_comment_id|댓글/대댓글 작성|
+|GET|/post/<int:post_id>/comments?limit=&offset=&comment_id=|||대댓글 조회|
+|PATCH|/post/<int:post_id>/comments||comment_id|댓글/대댓글 수정|
+|DELETE|/post/<int:post_id>/comments?comment_id=|||댓글/대댓글 삭제|
 
 
 ---
@@ -128,7 +131,13 @@ GET "http://127.0.0.1:8000/posts/detail/1 HTTP/1.1"
         "created_at": "2021-10-19 01:59:27",
         "updated_at": "2021-10-19 01:59:27"
     },
-    "Comment" : []
+    "Comment" : [
+        {
+        "comment_id": 1,
+        "content": "1번글 댓글",
+        "parent_comment": null
+        }
+    ]
 }
 ```
 
@@ -254,23 +263,75 @@ GET "http://127.0.0.1:8000/posts/list?category=자유게시판 HTTP/1.1"
    ]
 }
 ```
-### 9. 게시물 검색
+### 9. 게시물 댓글/대댓글 작성
 - Method : POST
-- EndpointURL : /posts/search
-- Remark : 게시글 내용 or 제목 검색 기능
+- EndpointURL : /posts/<int:post_id>/comments
+- Remark : 게시글 댓글 작성, "parent_comment_id" 입력 시 해당 댓글의 대댓글 작성
 - Request
 ```
-POST "http://127.0.0.1:8000/posts/search"
+POST "http://127.0.0.1:8000/post/1/comments HTTP/1.1"
+```
+- Response
+```
+{
+    "MESSAGE": "CREATE"
+}
+```
+### 10. 게시물 대댓글 조회
+- Method : GET
+- EndpointURL : /posts/<int:post_id>/comments?limit=&offset=&comment_id=
+- Remark : 게시글 대댓글 조회, QueryParams(limit/offset/comment_id)로 해당 댓글의 대댓글 조회 및 페이지네이션 가능
+- Request
+```
+POST "http://127.0.0.1:8000/post/1/comments?limit=3&offset=0&comment_id=1 HTTP/1.1"
 ```
 - Response
 ```
 {
     "Result": [
         {
-            "title": "안녕하세요",
-            "user": "김정수",
-            "body": "처음 뵙겠습니다. 김정수 입니다~!"
+            "comment_id": 10,
+            "content": "1번글 대댓글(2번째)",
+            "parent_comment": 1
+        },
+        {
+            "comment_id": 11,
+            "content": "1번글 대댓글(2번째)",
+            "parent_comment": 1
+        },
+        {
+            "comment_id": 25,
+            "content": "1번글 대댓글(test)",
+            "parent_comment": 1
         }
     ]
+}
+```
+### 11. 게시물 댓글/대댓글 수정
+- Method : PATCH
+- EndpointURL : /posts/<int:post_id>/comments
+- Remark : 게시글 댓글/대댓글 수정, "comment_id"로 원하는 댓글 수정 가능
+- Request
+```
+POST "http://127.0.0.1:8000/post/1/comments HTTP/1.1"
+```
+- Response
+```
+{
+    "MESSAGE": "SUCCESS"
+}
+```
+### 12. 게시물 댓글/대댓글 삭제
+- Method : DELETE
+- EndpointURL : /posts/<int:post_id>/comments?comment_id=
+- Remark : 게시글 댓글/대댓글 삭제, QueryParams(comment_id)로 해당 댓글 삭제 가능
+- Request
+```
+POST "http://127.0.0.1:8000/post/1/comments?comment_id=25 HTTP/1.1"
+```
+- Response
+```
+{
+    "MESSAGE": "DELETE"
 }
 ```
