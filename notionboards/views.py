@@ -263,6 +263,9 @@ class SearchView(View):
             all_posts = Post.objects.all()
             search_posts = all_posts.filter(Q(title__icontains = search_word)|Q(body__icontains = search_word))
 
+            if not search_posts.exists():
+                return JsonResponse({"message" : "NO_SEARCH"}, status=400)
+
             if search_word == "" or search_word == " " or len(search_word) >= 30:
                 return JsonResponse({"message" : "WRONG_REQUEST"}, status=401)
             
