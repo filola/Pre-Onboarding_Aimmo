@@ -64,7 +64,7 @@
 - Remark : (email : @와 .이 포함된 이메일 형식), (password : 8자리 이상. 숫자, 문자, 특수문자 포함)
 - Request
 ```
-POST "http://127.0.0.1:8000/user/signup HTTP/1.1"
+POST "http://3.36.239.109/user/signup HTTP/1.1"
 {
     "name" : "muk",
     "nickname" : "muk",
@@ -85,7 +85,7 @@ POST "http://127.0.0.1:8000/user/signup HTTP/1.1"
 - Remark : (email : @와 .이 포함된 이메일 형식), (password : 8자리 이상. 숫자, 문자, 특수문자 포함)
 - Request
 ```
-POST "http://127.0.0.1:8000/user/login HTTP/1.1"
+POST "http://3.36.239.109/user/login HTTP/1.1"
 {
     "email" : "muk@gamil.com",
     "password" : "mukmuk12!",
@@ -105,7 +105,7 @@ POST "http://127.0.0.1:8000/user/login HTTP/1.1"
 - Remark : 로그인한 유저만 게시글 작성 가능
 - Request
 ```
-POST "http://127.0.0.1:8000/posts HTTP/1.1"
+POST "http://3.36.239.109/posts HTTP/1.1"
 {
     "title"   : "test게시글",
     "body" : "내용 test입니다",
@@ -125,7 +125,7 @@ POST "http://127.0.0.1:8000/posts HTTP/1.1"
 - EndpointURL : /post/detail/<int:post_id>
 - Request
 ```
-GET "http://127.0.0.1:8000/posts/detail/1 HTTP/1.1"
+GET "http://3.36.239.109/posts/detail/1 HTTP/1.1"
 ```
 - Response
 ```
@@ -155,7 +155,7 @@ GET "http://127.0.0.1:8000/posts/detail/1 HTTP/1.1"
 - Remark : 로그인한 유저가 본인의 게시물 수정 가능
 - Request
 ```
-PUT "http://127.0.0.1:8000/posts/detail/13 HTTP/1.1" 
+PUT "http://3.36.239.109/posts/detail/13 HTTP/1.1" 
 {
    "title" : "test",
    "body" : "내용 수정test입니다",
@@ -175,7 +175,7 @@ PUT "http://127.0.0.1:8000/posts/detail/13 HTTP/1.1"
 - Remark : 로그인한 유저가 해당 게시물 삭제 가능
 - Request
 ```
-DELETE "http://127.0.0.1:8000/posts/detail/13 HTTP/1.1"
+DELETE "http://3.36.239.109/posts/detail/13 HTTP/1.1"
 ```
 - Response
 ```
@@ -190,7 +190,7 @@ DELETE "http://127.0.0.1:8000/posts/detail/13 HTTP/1.1"
 - Remark : 게시글 리스트 조회 기능, QueryParams(limit/offset)로 페이지네이션 가능
 - Request
 ```
-GET "http://127.0.0.1:8000/posts/list?page=1 HTTP/1.1"
+GET "http://3.36.239.109/posts/list?page=1 HTTP/1.1"
 ```
 - Response
 ```
@@ -241,7 +241,7 @@ GET "http://127.0.0.1:8000/posts/list?page=1 HTTP/1.1"
 - Remark : 게시글 카테고리 필터 기능, QueryParams(limit/offset)로 페이지네이션 가능
 - Request
 ```
-GET "http://127.0.0.1:8000/posts/list?category=자유게시판 HTTP/1.1"
+GET "http://3.36.239.109/posts/list?category=자유게시판 HTTP/1.1"
 ```
 - Response
 ```
@@ -277,7 +277,7 @@ GET "http://127.0.0.1:8000/posts/list?category=자유게시판 HTTP/1.1"
 - Remark : 게시글 댓글 작성, "parent_comment_id" 입력 시 해당 댓글의 대댓글 작성
 - Request
 ```
-POST "http://127.0.0.1:8000/post/1/comments HTTP/1.1"
+POST "http://3.36.239.109/post/1/comments HTTP/1.1"
 ```
 - Response
 ```
@@ -291,7 +291,7 @@ POST "http://127.0.0.1:8000/post/1/comments HTTP/1.1"
 - Remark : 게시글 대댓글 조회, QueryParams(limit/offset/comment_id)로 해당 댓글의 대댓글 조회 및 페이지네이션 가능
 - Request
 ```
-POST "http://127.0.0.1:8000/post/1/comments?limit=3&offset=0&comment_id=1 HTTP/1.1"
+POST "http://3.36.239.109/post/1/comments?limit=3&offset=0&comment_id=1 HTTP/1.1"
 ```
 - Response
 ```
@@ -321,7 +321,7 @@ POST "http://127.0.0.1:8000/post/1/comments?limit=3&offset=0&comment_id=1 HTTP/1
 - Remark : 게시글 댓글/대댓글 수정, "comment_id"로 원하는 댓글 수정 가능
 - Request
 ```
-POST "http://127.0.0.1:8000/post/1/comments HTTP/1.1"
+POST "http://3.36.239.109/post/1/comments HTTP/1.1"
 ```
 - Response
 ```
@@ -335,7 +335,7 @@ POST "http://127.0.0.1:8000/post/1/comments HTTP/1.1"
 - Remark : 게시글 댓글/대댓글 삭제, QueryParams(comment_id)로 해당 댓글 삭제 가능
 - Request
 ```
-POST "http://127.0.0.1:8000/post/1/comments?comment_id=25 HTTP/1.1"
+POST "http://3.36.239.109/post/1/comments?comment_id=25 HTTP/1.1"
 ```
 - Response
 ```
