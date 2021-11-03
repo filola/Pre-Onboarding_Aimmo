@@ -122,7 +122,7 @@ POST "http://127.0.0.1:8000/posts HTTP/1.1"
 
 ### 4. 게시물 조회
 - Method : GET
-- EndpointURL : /posts/detail/<int:post_id>
+- EndpointURL : /post/detail/<int:post_id>
 - Request
 ```
 GET "http://127.0.0.1:8000/posts/detail/1 HTTP/1.1"
@@ -186,7 +186,7 @@ DELETE "http://127.0.0.1:8000/posts/detail/13 HTTP/1.1"
 
 ### 7. 게시물 목록 조회
 - Method : GET
-- EndpointURL : /posts/list?page=
+- EndpointURL : /post/list?page=
 - Remark : 게시글 리스트 조회 기능, QueryParams(limit/offset)로 페이지네이션 가능
 - Request
 ```
@@ -237,7 +237,7 @@ GET "http://127.0.0.1:8000/posts/list?page=1 HTTP/1.1"
 ```
 ### 8. 게시물 카테고리 필터 조회
 - Method : GET
-- EndpointURL : /posts/list?category=
+- EndpointURL : /post/list?category=
 - Remark : 게시글 카테고리 필터 기능, QueryParams(limit/offset)로 페이지네이션 가능
 - Request
 ```
@@ -273,7 +273,7 @@ GET "http://127.0.0.1:8000/posts/list?category=자유게시판 HTTP/1.1"
 ```
 ### 9. 게시물 댓글/대댓글 작성
 - Method : POST
-- EndpointURL : /posts/<int:post_id>/comments
+- EndpointURL : /post/<int:post_id>/comments
 - Remark : 게시글 댓글 작성, "parent_comment_id" 입력 시 해당 댓글의 대댓글 작성
 - Request
 ```
@@ -287,7 +287,7 @@ POST "http://127.0.0.1:8000/post/1/comments HTTP/1.1"
 ```
 ### 10. 게시물 대댓글 조회
 - Method : GET
-- EndpointURL : /posts/<int:post_id>/comments?limit=&offset=&comment_id=
+- EndpointURL : /post/<int:post_id>/comments?limit=&offset=&comment_id=
 - Remark : 게시글 대댓글 조회, QueryParams(limit/offset/comment_id)로 해당 댓글의 대댓글 조회 및 페이지네이션 가능
 - Request
 ```
@@ -317,7 +317,7 @@ POST "http://127.0.0.1:8000/post/1/comments?limit=3&offset=0&comment_id=1 HTTP/1
 ```
 ### 11. 게시물 댓글/대댓글 수정
 - Method : PATCH
-- EndpointURL : /posts/<int:post_id>/comments
+- EndpointURL : /post/<int:post_id>/comments
 - Remark : 게시글 댓글/대댓글 수정, "comment_id"로 원하는 댓글 수정 가능
 - Request
 ```
@@ -331,7 +331,7 @@ POST "http://127.0.0.1:8000/post/1/comments HTTP/1.1"
 ```
 ### 12. 게시물 댓글/대댓글 삭제
 - Method : DELETE
-- EndpointURL : /posts/<int:post_id>/comments?comment_id=
+- EndpointURL : /post/<int:post_id>/comments?comment_id=
 - Remark : 게시글 댓글/대댓글 삭제, QueryParams(comment_id)로 해당 댓글 삭제 가능
 - Request
 ```
