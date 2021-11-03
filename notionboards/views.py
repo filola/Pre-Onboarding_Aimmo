@@ -185,9 +185,6 @@ class CommentView(View):
                 parent_comment_id = parent_comment_id
             )
 
-            if not Comment.objects.get(id=comment.parent_comment_id).parent_comment_id == None:
-                return JsonResponse({"MESSAGE": "NO_MORE_COMMENT"})
-            
             return JsonResponse({"MESSAGE": "CREATE"}, status=201)
         except KeyError:
             return JsonResponse({"MESSAGE": "KEY_ERROR"}, status=400)
@@ -279,4 +276,3 @@ class SearchView(View):
             return JsonResponse({"Result" : results}, status=200)
         except KeyError:
             return JsonResponse({"message" : "KEY_ERROR"}, status=400)
-            
