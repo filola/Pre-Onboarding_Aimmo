@@ -15,6 +15,12 @@
 |윤현묵 |https://github.com/fall031-muk|https://velog.io/@fall031|
 |최현수 |https://github.com/filola|https://velog.io/@chs_0303|
 ---
+## 기술스택
+- python, django
+- mongoDB, djongo
+- AWS EC2
+- Slack, Git 
+---
 
 ## 구현한 방법과 이유에 대한 간략한 내용
 
