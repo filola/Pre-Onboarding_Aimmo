@@ -40,6 +40,10 @@
 - 조회수를 통해 어떠한 글이 많은 사용자가 접근했는지 알 수 있고 쿠키를 통한 조회수 구현을 통해 한 사용자가 조회수를 중복으로 증가시킬 수 없게 구현
 ---
 
+### API
+
+[Postman link](https://documenter.getpostman.com/view/17228945/UVBzn9Wo)
+
 ## 자세한 실행 방법(endpoint 호출방법)
 
 ### ENDPOINT
