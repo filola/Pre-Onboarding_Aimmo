@@ -44,6 +44,8 @@
 
 [Postman link](https://documenter.getpostman.com/view/17228945/UVBzn9Wo)
 
+---
+
 ## 자세한 실행 방법(endpoint 호출방법)
 
 ### ENDPOINT
